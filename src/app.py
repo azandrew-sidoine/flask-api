@@ -1,3 +1,4 @@
+import os
 import flask
 from flask import jsonify, request, render_template
 import redis
@@ -5,6 +6,7 @@ import uuid
 import json
 
 app = flask.Flask(__name__)
+redisPort = port=os.getenv('REDIS_PORT')
 
 # Create some test data for our catalog in the form of a list of dictionaries.
 books = {
@@ -52,7 +54,7 @@ def createBook():
         id = str(uuid.uuid4())
         json['_id'] = id
         str_val = str(json)
-        client = createRedisClient('redis', 6379)
+        client = createRedisClient('redis', int(redisPort))
         client.set(id, str_val)
         return json
     else:
@@ -62,7 +64,7 @@ def createBook():
 def getBook(id: str):
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
-        client = createRedisClient('redis', 6379)
+        client = createRedisClient('redis', int(redisPort))
         str_val = client.get(id).decode("UTF-8")
         if (str_val is not None):
             json_object = json.loads(json.dumps(str_val))
