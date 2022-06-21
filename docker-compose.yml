@@ -2,17 +2,21 @@ version: "3"
 services:
   flaskapi:
     container_name: flaskapi
-    # image: flaskapi
-    build: .
+    image: flaskapi
+    # build: .
     volumes:
       - appdb:/etc/todos
     ports:
       - 3000:5000
     networks:
       - app
-
+    # Redémarre le service quand l'environment d'exécution de docker est redémarrer
+    # Ou lors d'un échec de l'environment docker
+    restart: always
+    depends_on:
+      - redis
     environment:
-      - REDIS_PORT=3000
+      - REDIS_PORT=6379
 
   redis:
     image: redis
